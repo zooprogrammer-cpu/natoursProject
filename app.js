@@ -1,21 +1,18 @@
+const fs = require ('fs');
 const express = require('express');
 const app = express();
 
-// Routing - how does an app respond to a certain client request
-app.get('/', (req, res) => {
-  //send just sends it to client
-  // res.status(200).send('Hello from the server side');
-  // can also use json
-  res.status(200)
-      .json(
-          { message : 'Hello from the server side',
-            app : 'Natours'
-          });
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`) );
 
-});
-
-app.post('/', (req, res) => {
-  res.send('You can post to this endpoint...');
+// send to client using jsend data specification
+app.get('/api/v1/tours', (req, res) => {
+  res.status(200).json({
+    status : 'success',
+    results : tours.length,
+    data : {
+      tours: tours
+    }
+  });
 });
 
 const port = 3000;
