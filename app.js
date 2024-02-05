@@ -18,6 +18,32 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// To get only a specific tour -
+// req.params are where all the variables are stored
+app.get('/api/v1/tours/:id/:x?', (req, res) => {
+  console.log(req.params);
+  const id = req.params.id * 1; // trick to convert string to number
+  const tour = tours.find(el=> el.id === id)
+
+  // if the id is bigger than the  length of the tours array, show 400 error
+  // if (id > tours.length) {
+  if (!tour) {
+    return res.status(404).json({
+      status : 'fail',
+      message: 'Invalid Id'
+    })
+  }
+
+
+  res.status(200).json({
+    status : 'success',
+    // results : tours.length,
+    data : {
+      tour
+    }
+  });
+});
+
 // POst- send request from client to server.
 // this is in the request
 // out of the box, express does not put body data in the request
