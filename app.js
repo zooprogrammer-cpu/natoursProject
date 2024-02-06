@@ -71,8 +71,43 @@ app.post('/api/v1/tours', (req,res) => {
       })
     }
   )
-  // res.send('Done');
 });
+
+// PATCH - update properties that needs to be updated rather
+// than the entire object
+app.patch('/api/v1/tours/:id', (req, res) => {
+
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status : 'fail',
+      message: 'Invalid Id'
+    })
+  }
+
+  res.status(200).json({
+    status : 'success',
+    data : {
+      tour : '<Updated tour here..>'
+    }
+  })
+})
+
+// DELETE
+app.delete('/api/v1/tours/:id', (req, res) => {
+
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status : 'fail',
+      message: 'Invalid Id'
+    })
+  }
+
+  res.status(204).json({
+    status : 'success',
+    data : null
+  })
+})
+
 
 const port = 3000;
 // add a callback function that gets called as
