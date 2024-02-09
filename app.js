@@ -7,8 +7,7 @@ app.use(express.json());
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`) );
 
-// send to client using jsend data specification
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
   res.status(200).json({
     status : 'success',
     results : tours.length,
@@ -16,11 +15,9 @@ app.get('/api/v1/tours', (req, res) => {
       tours: tours
     }
   });
-});
+}
 
-// To get only a specific tour -
-// req.params are where all the variables are stored
-app.get('/api/v1/tours/:id/:x?', (req, res) => {
+const getTour = (req,res) => {
   console.log(req.params);
   const id = req.params.id * 1; // trick to convert string to number
   const tour = tours.find(el=> el.id === id)
@@ -34,7 +31,6 @@ app.get('/api/v1/tours/:id/:x?', (req, res) => {
     })
   }
 
-
   res.status(200).json({
     status : 'success',
     // results : tours.length,
@@ -42,13 +38,9 @@ app.get('/api/v1/tours/:id/:x?', (req, res) => {
       tour
     }
   });
-});
+}
 
-// POst- send request from client to server.
-// this is in the request
-// out of the box, express does not put body data in the request
-// we need to use a middleware, app.use(express.json)
-app.post('/api/v1/tours', (req,res) => {
+const createTour = (req, res) => {
   // console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({id : newId}, req.body);
@@ -59,24 +51,21 @@ app.post('/api/v1/tours', (req,res) => {
   // we never want to block the vent loop
   // so we are not using the synchronous one
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-      // 201 stands for created
-      res.status(201).json({
-        status : 'success',
-        data : {
-          tour : newTour
-        }
-      })
-    }
+      `${__dirname}/dev-data/data/tours-simple.json`,
+      JSON.stringify(tours),
+      err => {
+        // 201 stands for created
+        res.status(201).json({
+          status : 'success',
+          data : {
+            tour : newTour
+          }
+        })
+      }
   )
-});
+}
 
-// PATCH - update properties that needs to be updated rather
-// than the entire object
-app.patch('/api/v1/tours/:id', (req, res) => {
-
+const updateTour = (req,res) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
       status : 'fail',
@@ -90,11 +79,9 @@ app.patch('/api/v1/tours/:id', (req, res) => {
       tour : '<Updated tour here..>'
     }
   })
-})
+}
 
-// DELETE
-app.delete('/api/v1/tours/:id', (req, res) => {
-
+const deleteTour = (req,res) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
       status : 'fail',
@@ -106,8 +93,22 @@ app.delete('/api/v1/tours/:id', (req, res) => {
     status : 'success',
     data : null
   })
-})
+}
 
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id/:x?', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app.route('/api/v1/tours')
+    .get(getAllTours)
+    .post(createTour);
+
+app.route('/api/v1/tours/:id')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour);
 
 const port = 3000;
 // add a callback function that gets called as
@@ -115,6 +116,8 @@ const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
+
+
 
 
 
