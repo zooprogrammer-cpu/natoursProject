@@ -160,29 +160,38 @@ const deleteUser = (req, res) => {
 
 // 3. Routes
 
+const tourRouter = express.Router();
+const userRouter = express.Router();
 // app.get('/api/v1/tours', getAllTours);
 // app.get('/api/v1/tours/:id/:x?', getTour);
 // app.post('/api/v1/tours', createTour);
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
-
-app.route('/api/v1/tours')
+// all of these routes are in the same router, app
+tourRouter
+    .route('/')
     .get(getAllTours)
     .post(createTour);
 
-app.route('/api/v1/tours/:id')
+tourRouter
+    .route('/:id')
     .get(getTour)
     .patch(updateTour)
     .delete(deleteTour);
 
-app.route('/api/v1/users')
+userRouter
+    .route('/')
     .get(getAllUsers)
     .post(createUser)
 
-app.route('api/v1/users/:id')
+userRouter
+    .route('/:id')
     .get(getUser)
     .patch(updateUser)
     .delete(deleteUser);
+
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 // 4) Start server
 const port = 3000;
