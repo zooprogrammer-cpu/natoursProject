@@ -1,8 +1,16 @@
 const fs = require ('fs');
 const express = require('express');
+const morgan = require('morgan');
+
 const app = express();
+
+// 1) Middlewares
+app.use(morgan('dev')); // third party middleware
 // middleware to put body data in the request
 // it sits between the request and the response
+// able to use express.json middleware to parse data
+// from client and puts it into req.body object to
+//send to endpoint that expects JSON data
 app.use(express.json());
 // We use app.use to use middleware.
 // calling express.json() returns a function that gets added
@@ -23,6 +31,7 @@ app.use((req, res, next) => {
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`) );
 
+//2) Route handlers
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
@@ -113,6 +122,8 @@ const deleteTour = (req,res) => {
   })
 }
 
+// 3. Routes
+
 // app.get('/api/v1/tours', getAllTours);
 // app.get('/api/v1/tours/:id/:x?', getTour);
 // app.post('/api/v1/tours', createTour);
@@ -128,6 +139,7 @@ app.route('/api/v1/tours/:id')
     .patch(updateTour)
     .delete(deleteTour);
 
+// 4) Start server
 const port = 3000;
 // add a callback function that gets called as
 // soon as the server starts listening
