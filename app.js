@@ -32,16 +32,11 @@ app.use((req, res, next) => {
 
 
 //3) ROUTES
+// mounting the routers in the two different routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-// 4) Start server
-const port = 3000;
-// add a callback function that gets called as
-// soon as the server starts listening
-app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
-});
+module.exports = app;
 
 
 
