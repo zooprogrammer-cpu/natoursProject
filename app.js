@@ -18,6 +18,8 @@ app.use(express.json());
 // calling express.json() returns a function that gets added
 // to the middleware stack.
 
+//middleware to access static file in file system-
+app.use(express.static(`${__dirname}/public`));
 // Creating our own middleware function
 app.use((req, res, next) => {
   console.log('Hello from the middleware');
