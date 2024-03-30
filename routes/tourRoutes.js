@@ -6,10 +6,16 @@ const router = express.Router();
 // url has an id such as get tour which has an id
 router.param('id', tourController.checkID);
 
+// create a checkBody middleware function
+// when creating a new tour,
+// check if body contains the name and price property
+// if not, send 400 status code
+// Add it to the post handler stack
+
 router
     .route('/')
     .get(tourController.getAllTours)
-    .post(tourController.createTour);
+    .post(tourController.checkBody, tourController.createTour);
 
 router
     .route('/:id')
