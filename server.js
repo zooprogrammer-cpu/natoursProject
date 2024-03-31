@@ -1,3 +1,7 @@
+// Everything that is not related to express,
+// we are going to do it outside of the app.js file here
+// Environment variables that are outside the scope of Express
+
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config({path: './config.env'});
@@ -6,7 +10,7 @@ const DB = process.env.DATABASE.replace(
     '<PASSWORD>',
     process.env.DATABASE_PASSWORD);
 
-// pass the DB string to mongoose.connect
+// pass the DB string to mongoose.connect()
 // the optional parameters are
 // just to avoid some deprecation warnings.
 // con will be the resolved value
@@ -16,12 +20,29 @@ mongoose.connect(DB, {
   useFindAndModify: false
 }).then(()=> console.log('DB Connection Successful'));
 
-// Everything that is not related to express,
-// we are going to do it outside of the app.js file
-// Environment variables that are outside the scope of Express
+// Schema for our data. Describing and validating it-
+const tourSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'A tour must have a name'],
+    unique: true
+  },
+  rating: {
+    type: Number,
+    default: 4.5
+  },
+  price: {
+    type : Number,
+    required: [true, 'A tour must have a price']
+  }
+});
+
+//Model -
+const Tour = mongoose.model('Tour', tourSchema);
 
 // console.log(process.env);
 const app = require('./app');
+const {mongo} = require("mongoose");
 
 // 4) Start server
 const port = process.env.port || 3000;
