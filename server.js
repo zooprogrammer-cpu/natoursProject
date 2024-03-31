@@ -40,9 +40,22 @@ const tourSchema = new mongoose.Schema({
 //Model -
 const Tour = mongoose.model('Tour', tourSchema);
 
+// create new document instance. Making new object out of a class using ES6.
+const testTour = new Tour({
+  name: 'The Mountain Climber',
+  rating: 5.0,
+  price: 1999
+});
+
+// Save to database -
+testTour.save().then(doc=>{
+  console.log(doc);
+}).catch(error=>{
+  console.log('ERROR:', error);
+})
+
 // console.log(process.env);
 const app = require('./app');
-const {mongo} = require("mongoose");
 
 // 4) Start server
 const port = process.env.port || 3000;
