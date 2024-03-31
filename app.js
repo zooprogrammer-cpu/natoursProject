@@ -7,7 +7,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // 1) Middlewares
-app.use(morgan('dev')); // third party middleware
+console.log(process.env.NODE_ENV);
+if(process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));// third party middleware
+}
 // middleware to put body data in the request
 // it sits between the request and the response
 // able to use express.json middleware to parse data
