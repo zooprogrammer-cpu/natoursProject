@@ -6,32 +6,46 @@ const Tour =require('./../models/tourModel');
 // );
 
 //2) Route handlers
-exports.getAllTours = (req, res) => {
-  console.log(req.requestTime);
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
 
-  // res.status(200).json({
-  //   status : 'success',
-  //   requestedAt : req.requestTime,
-  //   results : tours.length,
-  //   data : {
-  //     tours: tours
-  //   }
-  // });
+    res.status(200).json({
+      status : 'success',
+      results : tours.length,
+      data : {
+        tours: tours
+      }
+    });
+
+  }
+  catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    })
+  }
 }
 
-exports.getTour = (req,res) => {
-  console.log(req.params);
-  const id = req.params.id * 1; // trick to convert string to number
-  // const tour = tours.find(el=> el.id === id)
-  // console.log('in getTour, tour is:', tour);
+exports.getTour = async (req,res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    //findById is a method from mongoose that is  the shorthand for
+    //await Tour.findOne({_id: req.params.id})
 
-  // res.status(200).json({
-  //   status : 'success',
-  //   // results : tours.length,
-  //   data : {
-  //     tour
-  //   }
-  // });
+    res.status(200).json({
+      status : 'success',
+      data : {
+        tour
+      }
+    });
+  }
+  catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    })
+  }
 }
 
 exports.createTour = async (req, res) => {
