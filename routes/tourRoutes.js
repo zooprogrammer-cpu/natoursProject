@@ -4,7 +4,7 @@ const router = express.Router();
 
 // using the param - the console.log only prints if the
 // url has an id such as get tour which has an id
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);
 
 // create a checkBody middleware function
 // when creating a new tour,
