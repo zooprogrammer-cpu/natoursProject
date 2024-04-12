@@ -8,8 +8,42 @@ const Tour =require('./../models/tourModel');
 //2) Route handlers
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    // BUILD QUERY
+    const queryObj = {...req.query}; // make a copy of the query
+    console.log('queryObj before:', queryObj);
+    const excludedFields = ['page', 'sort', 'limit', 'fields']
 
+    // Remove these fields from the queryObj
+    excludedFields.forEach(el=>{
+      delete queryObj[el]
+    })
+
+    const query = Tour.find(queryObj);
+
+    //console.log(req.query); // this is the query url from postman
+    // const tours = await Tour.find(queryObj); //this returns a query. using filtered object instead of req.query
+    // First way to get query results:
+
+  // const tours = await Tour.find(
+  // {
+  //     this object is the same as re.query from postman
+  //     duration : 5,
+  //     difficulty : 'easy'
+  //  }
+        //req.query // third way is to use the query from postman since it is received as req.query
+
+    //);
+    // Second way to get query results using special mongoose methods
+    // const tours = await Tour.find({})
+    //     .where('duration')
+    //     .equals(5)
+    //     .where('difficulty')
+    //     .equals('easy');
+    // EXECUTE QUERY
+    const tours = await query;
+
+
+    // SEND QUERY
     res.status(200).json({
       status : 'success',
       results : tours.length,
