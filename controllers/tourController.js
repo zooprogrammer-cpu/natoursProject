@@ -11,7 +11,7 @@ exports.getAllTours = async (req, res) => {
     console.log(req.query);
 
     // BUILD QUERY
-    // 1) Filtering
+    // 1A) Filtering
     const queryObj = {...req.query}; // make a copy of the query
     const excludedFields = ['page', 'sort', 'limit', 'fields']
 
@@ -20,21 +20,29 @@ exports.getAllTours = async (req, res) => {
       delete queryObj[el]
     })
 
-    // 2) Advanced filtering
+    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    console.log(JSON.parse(queryStr));
-    const query = Tour.find(JSON.parse(queryStr));
 
-    //req.query // third way is to use the query from postman since it is received as req.query
+    let query = Tour.find(JSON.parse(queryStr));
 
-    //);
-    // Second way to get query results using special mongoose methods
-    // const tours = await Tour.find({})
-    //     .where('duration')
-    //     .equals(5)
-    //     .where('difficulty')
-    //     .equals('easy');
+    // 2) SORTING
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt'); // default query sort
+    }
+
+    // 3) Field Limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    }
+    else {
+      query = query.select('-__v');
+    }
+
     // EXECUTE QUERY
     const tours = await query;
 
