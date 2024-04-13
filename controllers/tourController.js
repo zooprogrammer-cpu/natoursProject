@@ -6,6 +6,14 @@ const Tour =require('./../models/tourModel');
 // );
 
 //2) Route handlers
+// middleware method for top 5 tours before it gets to the getAllTours below
+exports.aliasTopTours = (req,res,next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next(); //need this otherwise this middleware will be stuck here for ever
+}
+
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query);

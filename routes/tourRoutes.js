@@ -12,6 +12,15 @@ const router = express.Router();
 // if not, send 400 status code
 // Add it to the post handler stack
 
+// popular URL to show 5 top tours-
+// need middleware first to change the request object
+// when someone hits /top-5-cheap,
+// the first middleware function to run is aliasTopTours
+
+router
+    .route('/top-5-cheap')
+    .get(tourController.aliasTopTours, tourController.getAllTours);
+
 router
     .route('/')
     .get(tourController.getAllTours)
