@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path'); // Import the path module to handle file paths
 const Tour =require('./../models/tourModel');
+const APIFeatures = require('./../utils/apiFeatures');
+
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
@@ -14,120 +16,9 @@ exports.aliasTopTours = (req,res,next) => {
   next(); //need this otherwise this middleware will be stuck here for ever
 }
 
-class APIFeatures {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
-  }
-
-  filter() {
-    // 1A) Filtering
-    const queryObj = {...this.queryString}; // make a copy of the query
-    const excludedFields = ['page', 'sort', 'limit', 'fields']
-
-    // Remove these fields from the queryObj
-    excludedFields.forEach(el=>{
-      delete queryObj[el]
-    })
-
-    // 1B) Advanced filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-    this.query = this.query.find(JSON.parse(queryStr));
-
-    return this;
-  }
-
-  // 2) SORTING
-  sort () {
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      this.query = this.query.sort(sortBy);
-    }
-    return this;
-  }
-
-  limitFields() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
-    }
-    else {
-      this.query = this.query.select('-__v');
-    }
-
-    return this;
-  }
-
-  paginate () {
-    const page = this.queryString.page * 1 || 1 // convert string to number. Default value as 1.
-    const limit = this.queryString.limit * 1 || 100;
-    const skip = (page -1) * limit; // skip 20 results if on page 3
-    console.log(`page: ${page}, limit: ${limit}, skip: ${skip}`);
-    // 127.0.0.1:3000/api/v1/tours/?page=2&limit=10
-    // 1-10 for page 1, 11-20 for page 2, 21-30 for page 3
-    // page 2 means skip 10
-    this.query = this.query.skip(skip).limit(limit);
-    return this;
-  }
-}
-
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query);
-
-    // BUILD QUERY
-    // 1A) Filtering
-    // const queryObj = {...req.query}; // make a copy of the query
-    // const excludedFields = ['page', 'sort', 'limit', 'fields']
-    //
-    // // Remove these fields from the queryObj
-    // excludedFields.forEach(el=>{
-    //   delete queryObj[el]
-    // })
-
-    // 1B) Advanced filtering
-    // let queryStr = JSON.stringify(queryObj);
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    //
-    // let query = Tour.find(JSON.parse(queryStr));
-
-    // 2) SORTING
-    // if (req.query.sort) {
-    //   const sortBy = req.query.sort.split(',').join(' ');
-    //   query = query.sort(sortBy);
-    // }
-    // else {
-      //query = query.sort('-createdAt'); // default query sort
-    // }
-
-    // 3) Field Limiting
-    // if (req.query.fields) {
-    //   const fields = req.query.fields.split(',').join(' ');
-    //   query = query.select(fields);
-    // }
-    // else {
-    //   query = query.select('-__v');
-    // }
-
-    //4) Pagination
-    // const page = req.query.page * 1 || 1 // convert string to number. Default value as 1.
-    // const limit = req.query.limit * 1 || 100;
-    // const skip = (page -1) * limit; // skip 20 results if on page 3
-    // console.log(`page: ${page}, limit: ${limit}, skip: ${skip}`);
-    // // 127.0.0.1:3000/api/v1/tours/?page=2&limit=10
-    // // 1-10 for page 1, 11-20 for page 2, 21-30 for page 3
-    // // page 2 means skip 10
-    // query = query.skip(skip).limit(limit);
-    //
-    // if (req.query.page) {
-    //   const numTours = await Tour.countDocuments();
-    //   if (skip >= numTours) {
-    //     throw new Error('This page does not exist');
-    //   }
-    // }
-
     // EXECUTE QUERY
     // make a new object of APIFeatures class abd pass the queries
     // chaining these methods work since we are returning something from each method
