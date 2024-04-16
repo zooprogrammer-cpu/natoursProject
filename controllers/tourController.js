@@ -143,7 +143,7 @@ exports.getTourStats = async (req,res) => {
         $group: {
           _id: {$toUpper : '$difficulty'},
           // _id: '$ratingsAverage',
-          numTours : {$sum: 1},
+          numTours : {$sum: 1}, //count tours
           numRatings : {$sum: '$ratingsQuantity'},
           avgRating: {$avg: '$ratingsAverage'},
           avgPrice: {$avg: '$price'},
@@ -169,6 +169,57 @@ exports.getTourStats = async (req,res) => {
     });
   }
   catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message : err
+    })
+  }
+}
+
+exports.getMonthlyPan  = async(req,res) => {
+  try {
+    const year = req.params.year * 1; //2021
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates'
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {$month: '$startDates'},
+          numTourStarts: { $sum: 1 },
+          tours: {$push: '$name'}
+        }
+      },
+      {
+        $addFields: {month: '$_id'}
+      },
+      {
+        $project: {
+          _id: 0 // no longer show id
+        }
+      },
+      {
+        $sort: { numTourStarts: -1 }
+      }
+
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan
+      }
+    });
+  }
+  catch(err) {
     res.status(404).json({
       status: 'fail',
       message : err
